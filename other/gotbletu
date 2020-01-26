@@ -1,0 +1,12 @@
+
+# https://github.com/gotbletu/dotfiles/blob/master/newsbeuter/.newsbeuter/config
+
+	#macro i set browser "$IMAGEVIEWER %u"; open-in-browser ; set browser "$BROWSER %u"
+	#macro o set browser "$BROWSERCLI %u"; open-in-browser ; set browser "$BROWSER %u"
+	#macro m set browser "$PLAYER %u"; open-in-browser ; set browser "$BROWSER %u"
+	#macro r set browser "rtv -l %u"; open-in-browser ; set browser "$BROWSER %u"
+
+	## macro y set browser "$PLAYER $(youtube-dl -g %u)"; open-in-browser ; set browser "$BROWSER %u"
+
+
+

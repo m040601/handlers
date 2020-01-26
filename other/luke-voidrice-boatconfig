@@ -1,0 +1,97 @@
+
+# Mon Jun 25 01:04:56 WEST 2018
+#voidrice/config at master · LukeSmithxyz/voidrice
+#	https://github.com/LukeSmithxyz/voidrice/blob/master/.config/newsboat/config
+
+#	browser linkhandler
+#	macro , open-in-browser
+#	macro v set browser "i3 exec mpv"; open-in-browser ; set browser linkhandler
+#	macro y set browser "spawndl"; open-in-browser ; set browser linkhandler
+#	macro w set browser "w3m"; open-in-browser ; set browser linkhandler
+#	macro p set browser "dmenuhandler"; open-in-browser ; set browser linkhandler
+#	# c copies the link to the clipboard.
+#	# The line below is probably the skiddiest line I've ever written.
+#	macro c set browser "copy(){ echo $1 | xclip ;}; copy "; open-in-browser ; set browser linkhandler
+
+
+Sun Mar 31 08:58:37 UTC 2019	
+browser linkhandler
+macro , open-in-browser
+macro t set browser "tsp youtube-dl --add-metadata -ic"; open-in-browser ; set browser linkhandler
+macro a set browser "tsp youtube-dl --add-metadata -xic -f bestaudio/best"; open-in-browser ; set browser linkhandler
+macro v set browser "setsid nohup mpv"; open-in-browser ; set browser linkhandler
+macro w set browser "w3m"; open-in-browser ; set browser linkhandler
+macro p set browser "dmenuhandler"; open-in-browser ; set browser linkhandler
+macro c set browser "xsel -b <<<" ; open-in-browser ; set browser linkandler
+
+
+#	spawndl
+
+#	#!/bin/bash
+#	i3 exec "st -n dl -e youtube-dl $1"
+
+
+#	dmenuhandler
+#	voidrice/dmenuhandler at master · LukeSmithxyz/voidrice
+#	#!/bin/bash
+#	# Feed this script a link and it will give dmenu
+#	# some choice programs to use to open it.
+
+#	# The URL will be shown visually in 30 characters or less.
+#	if [[ "${#1}" -gt 30 ]];
+#	then
+#	visual="0:20"..." -7"
+#	else
+#	visual="$1"
+#	fi
+#	echo $visual
+
+#	x=$(echo -e "mpv\nmpv (loop)\nwget\nfeh\nbrowser\nw3m\nmpv (float)" | dmenu -i -p "How should I open '$visual'?")
+#	case "$x" in
+#		mpv) mpv -quiet "$1" 2&>/dev/null & disown ;;
+#		"mpv (loop)") mpv -quiet --loop "$1" 2&>/dev/null & disown ;;
+#		wget) wget "$1" 2&>/dev/null & disown ;;
+#		browser) $BROWSER "$1" 2&>/dev/null & disown ;;
+#		feh) feh "$1" 2&>/dev/null & disown ;;
+#		w3m) w3m "$1" 2&>/dev/null & disown ;;
+#		"mpv (float)") mpv --geometry=+0-0 --autofit=30%  --title="mpvfloat" /dev/video0 "$1" 2&>/dev/null & disown ;;
+#	esac
+#	https://github.com/LukeSmithxyz/voidrice/blob/master/.scripts/dmenuhandler
+
+
+
+#	linkhandler
+#	voidrice/linkhandler at master · LukeSmithxyz/voidrice
+#	#!/bin/bash
+
+#	# Feed script a url.
+#	# If an image, it will view in feh,
+#	# if a video or gif, it will view in mpv
+#	# if a music file or pdf, it will download,
+#	# otherwise it opens link in browser.
+
+#	# List of sites that will be opened in mpv.
+#	vidsites="youtube.com
+#		\|hooktube.com
+#		\|bitchute.com
+#		"
+#	ext="${1##*."
+#	mpvFiles="mkv mp4 gif webm"
+#	fehFiles="png jpg jpeg jpe"
+#	wgetFiles="mp3 flac opus mp3?source=feed pdf"
+
+#	if echo $fehFiles | grep -w $ext > /dev/null; then
+#		feh "$1" >/dev/null & disown
+#	elif echo $mpvFiles | grep -w $ext > /dev/null; then
+#		mpv -quiet "$1" > /dev/null & disown
+#	elif echo $wgetFiles | grep -w $ext > /dev/null; then
+#		wget "$1" >/dev/null & disown
+#	elif echo "$@" | grep "$vidsites">/dev/null; then
+#		mpv -quiet "$1" > /dev/null & disown
+#	else
+#		$BROWSER "$1" 2>/dev/null & disown
+#	fi
+#	https://github.com/LukeSmithxyz/voidrice/blob/master/.scripts/linkhandler
+
+
+
