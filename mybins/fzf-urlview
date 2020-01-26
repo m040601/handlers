@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# via fzf wiki
+# https://github.com/D630/bin/
+#
+# Simple replacement for urlview using fzf in X.
+#
+# Usage:
+#
+# $ furlview FILE1 ... FILEn
+# $ foo | furlview
+# $ furlview < FILE
+# $ furlview <<< "foo"
+# $ furlview <<URIS
+## foo
+## URIS
+#
+# FILE is regular or piped, that is also <(foo)
+
+function __x_web_browser {
+	setsidw x-web-browser "$1";
+};
+
+function __fzf {
+	fzf --tac -e -i -m;
+};
+
+function __ugrep {
+	grep-urls;
+};
+
+function __select {
+	__ugrep |
+	__fzf;
+};
+
+function __is_file [[ -p $1 || -f $1 ]];
+
+if
+	__is_file /dev/stdin;
+then
+	mapfile -t furls < <(__select);
+else
+	(($#)) || {
+		printf %s\\n aaarg? 1>&2;
+		exit 1;
+	};
+	mapfile -t furls < <(
+		for a; do
+			if
+				__is_file "$a";
+			then
+				cat -- "$a";
+			else
+				printf 'File %s is neather a regular file nor a named pipe, that is executable' "$a" 1>&2;
+				exit 1;
+			fi;
+		done |
+		__select;
+	);
+fi;
+
+case $DISPLAY in
+	('')
+		! :;;
+	(*)
+		for u in "${furls[@]}"; do
+			__x_web_browser "$u" &
+		done;
+		wait;;
+esac;
+
+# vim: set ft=sh :

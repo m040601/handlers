@@ -1,0 +1,4 @@
+#!/usr/bin/python3
+# from readability.readability import main
+from readability.readability import main
+main()
