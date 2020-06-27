@@ -1,0 +1,92 @@
+#!/bin/sh
+# https://efe.kim/files/scripts/linkhandler
+# Author: Efe Vural <efe@efe.kim>
+# give -d flag for manual selection
+# In my setup $TERMINAL=st, $PLAYER=mpv, $BROWSERCLI=w3m
+
+geturl(){
+primary=$(xclip -o 2>/dev/null | sed '1!d')
+clipboard=$(xclip -sel c -o 2>/dev/null | sed '1!d')
+url=$(printf "%s\n%s\n%s" "$1" "$primary" "$clipboard"\
+	| grep -E "^ *magnet:|^ *git://|^ *https?://" | sed '1!d;s/ *//g')
+[ -z "$url" ] && notify-send "Not a link" && exit
+}
+
+tmpdl(){ tmpfile=$(mktemp /tmp/linkhandler-"$1".XXXXXX)
+	setsid "$TERMINAL" -n download -e curl -o "$tmpfile" "$url" ;}
+torrentdl(){ setsid "$TORRENT" "$url" >/dev/null 2>&1 ;}
+gitdl(){ setsid "$TERMINAL" -n download\ -e git clone "$url" ;}
+imgview(){ tmpdl pic && setsid sxiv -qfabsf "$tmpfile" >/dev/null 2>&1
+	rm "$tmpfile" ;}
+pdfview(){ tmpdl pdf && setsid zathura "$tmpfile" >/dev/null 2>&1
+	rm "$tmpfile" ;}
+htmlview(){ setsid "$TERMINAL" -e "$BROWSERCLI" "$url" >/dev/null 2>&1 ;}
+torview(){ setsid torsocks "$TERMINAL" -e "$BROWSERCLI" "$url"
+	>/dev/null 2>&1 ;}
+videoplay(){ tmpdl vid &&
+	setsid "$PLAYER" --no-terminal "$tmpfile" >/dev/null 2>&1
+	rm "$tmpfile" ;}
+audioplay(){ tmpdl aud &&
+	setsid "$TERMINAL" -e "$PLAYER" --no-video "$tmpfile" >/dev/null 2>&1
+	rm "$tmpfile" ;}
+streamplay(){ notify-send "Starting stream" &\
+	setsid "$PLAYER" --no-terminal "$url" >/dev/null 2>&1 ||
+	notify-send "Stream failed" ;}
+
+autohandler() {
+case "$url" in
+	(*.pdf) pdfview & ;;
+	(*.mkv|*.webm|*.mp4|*.gifv) videoplay & ;;
+	(*.png|*.jpg|*.jpeg|*.jpe|*.gif) imgview & ;;
+	(*.mp3|*.flac|*.opus|*.ogg|*.mp3?source) audioplay & ;;
+	(*youtube.com*|*m.youtube.com*|*youtu.be*|*twitch.tv*|*hooktube.com*\
+	|*bitchute.com*|*liveleak.com*|*crunchyroll.com*) streamplay & ;;
+	(git://*) gitdl & ;;
+	(magnet:*) torrentdl & ;;
+	(http://*.onion|http://*.onion/*) torview & ;;
+	(http://*|https://*) htmlview & ;;
+esac
+}
+
+dmenuhandler(){
+visual=$(echo "$url" | sed -E '/^.{30}/s/^(.{20}).*(.{7})$/\1...\2/')
+options="video\naudio\ndownload\nimage\npdf\nbrowser\nbrowsergui\
+\nbrowsercli\ntorrent\nbookmark\nfeed\ncomments\ntor\nytinfo\
+\nsubscribe\ncopy\nstream\ngitclone"
+selection=$(echo "$options" | dmenu -i -p "Open '$visual':")
+case "$selection" in
+	(video) videoplay & ;;
+	(audio) audioplay & ;;
+	(download) cd ~/Downloads/
+		setsid "$TERMINAL" -n download -e curl -OL "$url" ||
+		setsid "$TERMINAL" -n download -e curl -o\
+		"$(echo "$url" | sed 's_.*/\(.*\)/*$_\1.html_')" "$url" & ;;
+	(image) imgview & ;;
+	(document) pdfview & ;;
+	(browsergui) setsid "$BROWSERGUI" "$url" & ;;
+	(browsercli) htmlview & ;;
+	(torrent) torrentdl & ;;
+	(bookmark) echo "$url" >> "$HOME/.bookmarks" & ;;
+	(feed) echo "$url" >> "$HOME/.newsbeuter/urls" & ;;
+	(tor) torview & ;;
+	(comments) setsid "$TERMINAL" youtube-viewer -c "$url" & ;;
+	(ytinfo) setsid "$TERMINAL" youtube-viewer -i "$url" & ;;
+	(subscribe) chanid=$(youtube-viewer --no-interactive --extract\
+		'*CHANNELID* #*AUTHOR*' "$url")
+		[ "$(echo "$chanid" | sed -n $=)" = "1" ] || exit
+		echo "https://www.youtube.com/feeds/videos.xml?channel_id=$chanid"\
+		>> "$HOME/.newsbeuter/urls" & ;;
+	(copy) echo "$url" | xclip -i -f | xclip -sel c -i ;;
+	(stream) streamplay & ;;
+	(gitclone) gitdl & ;;
+	(*) $selection "$url" ;;
+esac
+}
+
+if [ "$1" = "-d" ]
+then shift 1 ; geturl "$1" ; dmenuhandler >/dev/null 2>&1 &
+else geturl "$1" ; autohandler >/dev/null 2>&1 & 
+fi
+
+
+
