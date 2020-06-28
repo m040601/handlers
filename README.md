@@ -1,5 +1,9 @@
 handlers and pipes
 
+### jul2020 gotbletu 'urlportal'
+
+https://github.com/gotbletu/shownotes/blob/master/urlportal.sh
+
 ### apr2020 drew
 
 
