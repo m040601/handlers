@@ -1,5 +1,56 @@
 handlers and pipes
 
+
+### ago20 newsboat linkhandler (for macro links also)
+
+
+https://github.com/nsklaus/dotfiles/blob/master/.local/bin/linkhandler
+
+````
+#!/bin/sh
+
+# Feed script a url or file location.
+# If an image, it will view in sxiv,
+# if a video or gif, it will view in mpv
+# if a music file or pdf, it will download,
+# otherwise it opens link in browser.
+
+# If no url given. Opens browser. For using script as $BROWSER.
+[ -z "$1" ] && { "$BROWSER"; exit; }
+
+case "$1" in
+	*mkv|*webm|*mp4|*youtube.com/watch*|*invidio.us/watch*|*youtube.com/playlist*|*youtu.be*|*hooktube.com*|*bitchute.com*)
+		setsid -f mpv -quiet "$1" >/dev/null 2>&1 ;;
+	*png|*jpg|*jpe|*jpeg|*gif)
+		curl -sL "$1" > "/tmp/$(echo "$1" | sed "s/.*\///")" && sxiv -a "/tmp/$(echo "$1" | sed "s/.*\///")"  >/dev/null 2>&1 & ;;
+	*mp3|*flac|*opus|*mp3?source*)
+		setsid -f tsp curl -LO "$1" >/dev/null 2>&1 ;;
+	*)
+		if [ -f "$1" ]; then "$TERMINAL" -e "$EDITOR" "$1"
+	else setsid -f "$BROWSER" "$1" >/dev/null 2>&1; fi ;;
+esac
+````
+
+
+
+
+
+how to execute macro on a specific link ? · Issue #1118 · newsboat/newsboat
+https://github.com/newsboat/newsboat/issues/1118
+
+````
+browser linkhandler
+macro , open-in-browser
+macro t set browser "qndl" ; open-in-browser ; set browser linkhandler
+macro a set browser "tsp youtube-dl --add-metadata -xic -f bestaudio/best" ; open-in-browser ; set browser linkhandler
+macro v set browser "setsid -f mpv" ; open-in-browser ; set browser linkhandler
+macro w set browser "lynx" ; open-in-browser ; set browser linkhandler
+macro p set browser "dmenuhandler" ; open-in-browser ; set browser linkhandler
+macro c set browser "xsel -b <<<" ; open-in-browser ; set browser linkhandler
+macro C set browser "youtube-viewer --comments=%u" ; open-in-browser ; set browser linkhandler
+macro d set browser "curl -LO %u" ; open-in-browser ; set browser linkhandler
+````
+
 ### jul2020 gotbletu 'urlportal'
 
 https://github.com/gotbletu/shownotes/blob/master/urlportal.sh
