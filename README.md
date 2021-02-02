@@ -1,6 +1,10 @@
 handlers and pipes
 
 
+### jan 21 gotbletu urlportal
+
+https://github.com/gotbletu/dotfiles_v2/blob/master/normal_user/scripts/.scripts/urlportal
+
 ### ago20 newsboat linkhandler (for macro links also)
 
 
