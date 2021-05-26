@@ -1,5 +1,8 @@
 handlers and pipes
 
+### may 21 more "linkhandlers
+
+[dotfiles/weblauncher at master · azimut/dotfiles](https://github.com/azimut/dotfiles/blob/master/homedir/bin/weblauncher)
 
 ### jan 21 gotbletu urlportal
 
