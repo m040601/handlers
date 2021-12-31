@@ -1,5 +1,9 @@
 handlers and pipes
 
+### dec 21
+
+lots of simple newsboat handlers, https://github.com/T3SQ8/dotfiles/blob/master/bin/.local/bin/openfeed-default
+
 ### sep 21
 
 
